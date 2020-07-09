@@ -63,7 +63,7 @@ class LGADSignal:
 			self.amplitude_value = self._find_baseline_amplitude()
 			return self.amplitude
 	
-	def _find_rise_window(self, low=10, high=90):
+	def _find_rise_window_indices(self, low=10, high=90):
 		below_low = self.s < low/100*self.amplitude + self.baseline
 		above_high = self.s > high/100*self.amplitude + self.baseline
 		between = (self.s > low/100*self.amplitude + self.baseline) & (self.s < high/100*self.amplitude + self.baseline)
@@ -89,16 +89,28 @@ class LGADSignal:
 		if hasattr(self, 'risetime_value'):
 			return self.risetime_value
 		else:
-			k_start, k_stop = self.rise_window_indices
-			self.risetime_value = self.t[k_stop] - self.t[k_start]
+			self.risetime_value = self.rise_window_times[1] - self.rise_window_times[0]
 			return self.risetime
+	
+	@property
+	def rise_window_times(self):
+		if hasattr(self, 'rise_window_time_value'):
+			return self.rise_window_time_value
+		else:
+			k_start, k_stop = self.rise_window_indices
+			slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
+			t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
+			slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
+			t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
+			self.rise_window_time_value = (t_start_rise, t_stop_rise)
+			return self.rise_window_times
 	
 	@property
 	def rise_window_indices(self):
 		if hasattr(self, 'k_start_rise') and hasattr(self, 'k_stop_rise'):
 			return (self.k_start_rise, self.k_stop_rise)
 		else:
-			k_start, k_stop = self._find_rise_window()
+			k_start, k_stop = self._find_rise_window_indices()
 			self.k_start_rise = k_start
 			self.k_stop_rise = k_stop
 			return self.rise_window_indices
