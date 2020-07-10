@@ -5,8 +5,24 @@ import matplotlib.patches as patches
 
 class LGADSignal:
 	def __init__(self, time, samples):
-		self.t = time
-		self.s = samples
+		self.time = time
+		self.samples = samples
+	
+	@property
+	def t(self):
+		return self.time
+	
+	@property
+	def s(self):
+		return self.samples
+	
+	@property
+	def s_norm(self):
+		if hasattr(self, '_s_norm'):
+			return self._s_norm
+		else:
+			self._s_norm = (self.s - self.baseline)/self.amplitude
+			return self.s_norm
 	
 	def _find_baseline(self, sigmas=1):
 		for k, sample in enumerate(self.s):
