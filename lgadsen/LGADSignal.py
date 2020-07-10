@@ -148,7 +148,7 @@ def plot_signal_analysis(signal: LGADSignal, ax):
 	)
 	rise_window_rectangle = patches.Rectangle(
 		(
-			signal.t[signal.rise_window_indices[0]], 
+			signal.rise_window_times[0], 
 			signal.baseline + .1*signal.amplitude
 		),
 		signal.risetime,
