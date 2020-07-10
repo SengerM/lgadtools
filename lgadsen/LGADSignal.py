@@ -8,20 +8,6 @@ class LGADSignal:
 		self.t = time
 		self.s = samples
 	
-	def linearly_interpolated_val(self, t):
-		if isinstance(t, numbers.Number):
-			if t < min(self.t) or t > max(self.t):
-				raise ValueError('"t" is outside the valid data range')
-			prev_t_data_index = np.where(self.t <= t)[-1][-1]
-			if prev_t_data_index == len(self.t)-1:
-				return self.s[-1]
-			slope = (self.s[prev_t_data_index+1] - self.s[prev_t_data_index])/(self.t[prev_t_data_index+1] - self.t[prev_t_data_index])
-			return (t-self.t[prev_t_data_index])*slope + self.s[prev_t_data_index]
-		elif hasattr(t, '__iter__'):
-			return [self.linearly_interpolated_val(t_val) for t_val in t]
-		else:
-			raise ValueError('"t" must be a number or an iterable of numbers')
-	
 	def _find_baseline(self, sigmas=1):
 		for k, sample in enumerate(self.s):
 			if k < 9:
