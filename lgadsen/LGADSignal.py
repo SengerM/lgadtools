@@ -1,5 +1,7 @@
 import numpy as np
 import numbers
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class LGADSignal:
 	def __init__(self, time, samples):
@@ -114,3 +116,47 @@ class LGADSignal:
 			self.k_start_rise = k_start
 			self.k_stop_rise = k_stop
 			return self.rise_window_indices
+
+def plot_signal_analysis(signal: LGADSignal, ax):
+	ax.plot(
+		signal.t,
+		signal.s,
+		marker = '.'
+	)
+	ax.plot(
+		[min(signal.t), max(signal.t)],
+		[signal.baseline, signal.baseline],
+		label = 'baseline'
+	)
+	ax.plot(
+		[min(signal.t), max(signal.t)],
+		[signal.baseline + signal.noise_std, signal.baseline + signal.noise_std],
+		label = 'noise std',
+		color = (0,0,0),
+		linestyle = '--'
+	)
+	ax.plot(
+		[min(signal.t), max(signal.t)],
+		[signal.baseline - signal.noise_std, signal.baseline - signal.noise_std],
+		color = (0,0,0),
+		linestyle = '--'
+	)
+	ax.plot(
+		[min(signal.t), max(signal.t)],
+		[signal.amplitude + signal.baseline, signal.amplitude + signal.baseline],
+		label = 'amplitude + baseline'
+	)
+	rise_window_rectangle = patches.Rectangle(
+		(
+			signal.t[signal.rise_window_indices[0]], 
+			signal.baseline + .1*signal.amplitude
+		),
+		signal.risetime,
+		.8*signal.amplitude,
+		alpha = .3,
+		color = (0,0,0)
+	)
+	ax.add_patch(rise_window_rectangle)
+	ax.set_xlabel('Time (s)')
+	ax.set_ylabel('Signal (V)')
+	ax.legend()
