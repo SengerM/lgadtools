@@ -93,31 +93,55 @@ class LGADSignal:
 		if hasattr(self, 'risetime_value'):
 			return self.risetime_value
 		else:
-			self.risetime_value = self.rise_window_times[1] - self.rise_window_times[0]
-			return self.risetime
+			try:
+				self.risetime_value = self.rise_window_times[1] - self.rise_window_times[0]
+				return self.risetime
+			except TypeError:
+				return None
 	
 	@property
 	def rise_window_times(self):
 		if hasattr(self, 'rise_window_time_value'):
 			return self.rise_window_time_value
 		else:
-			k_start, k_stop = self.rise_window_indices
-			slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
-			t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
-			slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
-			t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
-			self.rise_window_time_value = (t_start_rise, t_stop_rise)
-			return self.rise_window_times
+			try:
+				k_start, k_stop = self.rise_window_indices
+				slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
+				t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
+				slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
+				t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
+				self.rise_window_time_value = (t_start_rise, t_stop_rise)
+				return self.rise_window_times
+			except TypeError:
+				print('WARNING: cannot find rise window times')
 	
 	@property
 	def rise_window_indices(self):
 		if hasattr(self, 'k_start_rise') and hasattr(self, 'k_stop_rise'):
 			return (self.k_start_rise, self.k_stop_rise)
 		else:
-			k_start, k_stop = self._find_rise_window_indices()
-			self.k_start_rise = k_start
-			self.k_stop_rise = k_stop
-			return self.rise_window_indices
+			try:
+				k_start, k_stop = self._find_rise_window_indices()
+				self.k_start_rise = k_start
+				self.k_stop_rise = k_stop
+				return self.rise_window_indices
+			except TypeError:
+				print('WARNING: cannot find rise window indices')
+	
+	def plot(self, ax, *args, **kwargs):
+		_fig, _ax = plt.subplots()
+		if type(ax) == type(_ax):
+			ax.plot(
+				self.t,
+				self.s,
+				*args,
+				**kwargs
+			)
+		else:
+			raise TypeError('The "ax" argument must be an instance of type ' + str(type(_ax)))
+		plt.close(_fig)
+		del(_fig)
+		del(_ax)
 
 def plot_signal_analysis(signal: LGADSignal, ax):
 	ax.plot(
