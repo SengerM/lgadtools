@@ -5,6 +5,10 @@ import matplotlib.patches as patches
 
 class LGADSignal:
 	def __init__(self, time, samples):
+		if type(time) == list:
+			time = np.array(time)
+		if type(samples) == list:
+			samples = np.array(samples)
 		self.time = time
 		self.samples = samples
 	
