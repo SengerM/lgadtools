@@ -1,9 +1,9 @@
 import ROOT as root
-from lgadsen.LGADSignal import LGADSignal
+from .LGADSignal import LGADSignal
 
-root.gSystem.Load('~/.TCTAnalyse.V2.2/TCTAnalyse.sl')
+root.gSystem.Load('~/.TCTAnalyse.V2.2/TCTAnalyse.sl') # WARNING: this is hardcoded!
 
-class PSTCTpy:
+class PSTCT:
 	# Experimental wrapper for the PSTCT class described here: http://particulars.si/TCTAnalyse/PSTCT.html#PSTCT:PSTCT
 	def __init__(self, fname, time0 = 0, Bin = 2):
 		self.root_object = root.PSTCT(fname, time0, Bin)

@@ -1,4 +1,4 @@
-name = "lgadsen"
+name = "lgadtools"
 
 # Numerical version:
 __version_info__ = (0, 0, 0)
