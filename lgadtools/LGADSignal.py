@@ -3,7 +3,7 @@ import numbers
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-class LGADSignal:
+class Signal:
 	def __init__(self, time, samples):
 		if type(time) == list:
 			time = np.array(time)
@@ -19,7 +19,8 @@ class LGADSignal:
 	@property
 	def s(self):
 		return self.samples
-	
+
+class LGADSignal(Signal):
 	@property
 	def s_norm(self):
 		if hasattr(self, '_s_norm'):
