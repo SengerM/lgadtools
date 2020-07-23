@@ -2,6 +2,7 @@ import numpy as np
 import numbers
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from scipy import interpolate
 
 class Signal:
 	def __init__(self, time, samples):
@@ -19,6 +20,9 @@ class Signal:
 	@property
 	def s(self):
 		return self.samples
+	
+	def signal_at(self, time):
+		return interpolate.interp1d(self.t, self.s)(time)
 
 class LGADSignal(Signal):
 	@property
@@ -93,6 +97,18 @@ class LGADSignal(Signal):
 			if rising_from_low and rising_to_high:
 				return k_start_rise, k_stop_rise
 	
+	def time_at(self, percentage):
+		# Returns the time at <percentage> in the rising window using linear interpolation between the points.
+		_min_perc = 10
+		_max_perc = 100
+		if not _min_perc <= percentage <= _max_perc:
+			raise ValueError('<percentage> must be between ' + str(_min_perc) + ' and ' + str(_max_perc) + ', received ' + str(percentage))
+		time_vs_voltage_in_rise_window = interpolate.interp1d(
+			x = self.s[self.rise_window_indices[0]:np.argmax(self.s)],
+			y = self.t[self.rise_window_indices[0]:np.argmax(self.s)],
+		)
+		return time_vs_voltage_in_rise_window(self.amplitude*percentage/100 + self.baseline)
+	
 	@property
 	def risetime(self):
 		if hasattr(self, 'risetime_value'):
@@ -147,6 +163,10 @@ class LGADSignal(Signal):
 		plt.close(_fig)
 		del(_fig)
 		del(_ax)
+	
+	def plot_with_analysis(self, ax):
+		plot_signal_analysis(self, ax)
+		
 
 def plot_signal_analysis(signal: LGADSignal, ax):
 	ax.plot(
