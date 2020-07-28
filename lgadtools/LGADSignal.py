@@ -5,6 +5,7 @@ import matplotlib.patches as patches
 from scipy import interpolate
 
 class Signal:
+	# Implements a signal that was sampled.
 	def __init__(self, time, samples):
 		if type(time) == list:
 			time = np.array(time)
@@ -15,18 +16,24 @@ class Signal:
 	
 	@property
 	def t(self):
+		# Returns the time samples.
 		return self.time
 	
 	@property
 	def s(self):
+		# Returns the signal samples.
 		return self.samples
 	
 	def signal_at(self, time):
+		# Returns the value of the signal at any time using a linear interpolation.
 		return interpolate.interp1d(self.t, self.s)(time)
 
 class LGADSignal(Signal):
+	# Adapts the "Signal" class to signals that have the shape of that comming out
+	# from an LGAD detector, i.e. a pulse.
 	@property
 	def s_norm(self):
+		# Returns the samples normalized between 0 and 1.
 		if hasattr(self, '_s_norm'):
 			return self._s_norm
 		else:
@@ -34,6 +41,7 @@ class LGADSignal(Signal):
 			return self.s_norm
 	
 	def _find_baseline(self, sigmas=1):
+		# Calculates the baseline. This method is not intended to be called by the user.
 		for k, sample in enumerate(self.s):
 			if k < 9:
 				continue
@@ -43,10 +51,12 @@ class LGADSignal(Signal):
 		return baseline
 	
 	def _find_noise_std(self):
+		# Calculates the noise. This method is not intended to be called by the user. 
 		return self.s[:self.rise_window_indices[0]].std()
 	
 	@property
 	def noise_std(self):
+		# Returns the noise standard deviation.
 		if hasattr(self, 'noise_std_value'):
 			return self.noise_std_value
 		else:
@@ -55,10 +65,12 @@ class LGADSignal(Signal):
 	
 	@property
 	def SNR(self):
+		# Returns the signal to noise ratio.
 		return self.amplitude/self.noise_std
 	
 	@property
 	def baseline(self):
+		# Returns the baseline.
 		if hasattr(self, 'baseline_value'):
 			return self.baseline_value
 		else:
@@ -70,6 +82,7 @@ class LGADSignal(Signal):
 	
 	@property
 	def amplitude(self):
+		# Returns the amplitude of the signal.
 		if hasattr(self, 'amplitude_value'):
 			return self.amplitude_value
 		else:
@@ -77,6 +90,7 @@ class LGADSignal(Signal):
 			return self.amplitude
 	
 	def _find_rise_window_indices(self, low=10, high=90):
+		# Finds the two indices such that the signal rises between these two indices. This method is not intended to be called by the user.
 		below_low = self.s < low/100*self.amplitude + self.baseline
 		above_high = self.s > high/100*self.amplitude + self.baseline
 		between = (self.s > low/100*self.amplitude + self.baseline) & (self.s < high/100*self.amplitude + self.baseline)
@@ -111,6 +125,7 @@ class LGADSignal(Signal):
 	
 	@property
 	def risetime(self):
+		# Returns the risetime.
 		if hasattr(self, 'risetime_value'):
 			return self.risetime_value
 		else:
@@ -122,6 +137,7 @@ class LGADSignal(Signal):
 	
 	@property
 	def rise_window_times(self):
+		# Returns t_start and t_stop at which the signal starts to rise and stops to rise.
 		if hasattr(self, 'rise_window_time_value'):
 			return self.rise_window_time_value
 		else:
@@ -138,6 +154,7 @@ class LGADSignal(Signal):
 	
 	@property
 	def rise_window_indices(self):
+		# Returns the indices k_start and k_stop where the signal rises.
 		if hasattr(self, 'k_start_rise') and hasattr(self, 'k_stop_rise'):
 			return (self.k_start_rise, self.k_stop_rise)
 		else:
@@ -150,6 +167,7 @@ class LGADSignal(Signal):
 				print('WARNING: cannot find rise window indices')
 	
 	def plot(self, ax, *args, **kwargs):
+		# Plots the signal.
 		_fig, _ax = plt.subplots()
 		if type(ax) == type(_ax):
 			ax.plot(
