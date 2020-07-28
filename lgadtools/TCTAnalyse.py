@@ -1,7 +1,10 @@
 import ROOT as root
 from .LGADSignal import LGADSignal
 
-root.gSystem.Load('~/.TCTAnalyse.V2.2/TCTAnalyse.sl') # WARNING: this is hardcoded!
+def load_TCTAnalyse(path):
+	root.gSystem.Load(path)
+
+load_TCTAnalyse(path = '~/.TCTAnalyse.V2.2/TCTAnalyse.sl') # Warning! This is harcoded.
 
 class PSTCT:
 	# Experimental wrapper for the PSTCT class described here: http://particulars.si/TCTAnalyse/PSTCT.html#PSTCT:PSTCT
