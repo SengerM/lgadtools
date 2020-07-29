@@ -118,8 +118,8 @@ class LGADSignal(Signal):
 		if not _min_perc <= percentage <= _max_perc:
 			raise ValueError('<percentage> must be between ' + str(_min_perc) + ' and ' + str(_max_perc) + ', received ' + str(percentage))
 		time_vs_voltage_in_rise_window = interpolate.interp1d(
-			x = self.s[self.rise_window_indices[0]:np.argmax(self.s)],
-			y = self.t[self.rise_window_indices[0]:np.argmax(self.s)],
+			x = self.s[self.rise_window_indices[0]-1:np.argmax(self.s)],
+			y = self.t[self.rise_window_indices[0]-1:np.argmax(self.s)],
 		)
 		return time_vs_voltage_in_rise_window(self.amplitude*percentage/100 + self.baseline)
 	
