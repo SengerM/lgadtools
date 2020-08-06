@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from lgadtools.LGADSignal import LGADSignal
+from .LGADSignal import LGADSignal
 
 def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_numbers = []):
 	# C2--Trace--00106.txt
