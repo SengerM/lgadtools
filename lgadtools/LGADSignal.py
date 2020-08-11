@@ -97,7 +97,7 @@ class LGADSignal(Signal):
 		
 		rising_from_low = False
 		rising_to_high = False
-		for k in range(len(self.s)):
+		for k in range(len(self.s)-1):
 			if not between[k]:
 				rising_from_low = False
 				rising_to_high = False
