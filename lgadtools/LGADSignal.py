@@ -141,16 +141,13 @@ class LGADSignal(Signal):
 		if hasattr(self, 'rise_window_time_value'):
 			return self.rise_window_time_value
 		else:
-			try:
-				k_start, k_stop = self.rise_window_indices
-				slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
-				t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
-				slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
-				t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
-				self.rise_window_time_value = (t_start_rise, t_stop_rise)
-				return self.rise_window_times
-			except TypeError:
-				print('WARNING: cannot find rise window times')
+			k_start, k_stop = self.rise_window_indices
+			slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
+			t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
+			slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
+			t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
+			self.rise_window_time_value = (t_start_rise, t_stop_rise)
+			return self.rise_window_times
 	
 	@property
 	def rise_window_indices(self):
@@ -158,13 +155,10 @@ class LGADSignal(Signal):
 		if hasattr(self, 'k_start_rise') and hasattr(self, 'k_stop_rise'):
 			return (self.k_start_rise, self.k_stop_rise)
 		else:
-			try:
-				k_start, k_stop = self._find_rise_window_indices()
-				self.k_start_rise = k_start
-				self.k_stop_rise = k_stop
-				return self.rise_window_indices
-			except TypeError:
-				print('WARNING: cannot find rise window indices')
+			k_start, k_stop = self._find_rise_window_indices()
+			self.k_start_rise = k_start
+			self.k_stop_rise = k_stop
+			return self.rise_window_indices
 	
 	def plot(self, ax, *args, **kwargs):
 		# Plots the signal.
