@@ -31,6 +31,16 @@ class Signal:
 class LGADSignal(Signal):
 	# Adapts the "Signal" class to signals that have the shape of that comming out
 	# from an LGAD detector, i.e. a pulse.
+
+	@property
+	def worth(self):
+		try:
+			self.rise_window_indices
+		except: # If this is noise or some other crap but there is no LGAD pulse at all.
+			return False
+		else:
+			return True
+	
 	@property
 	def s_norm(self):
 		# Returns the samples normalized between 0 and 1.
