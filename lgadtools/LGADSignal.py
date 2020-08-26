@@ -38,8 +38,9 @@ class LGADSignal(Signal):
 			self.rise_window_indices
 		except: # If this is noise or some other crap but there is no LGAD pulse at all.
 			return False
-		else:
-			return True
+		if self.risetime <= 0:
+			return False
+		return True
 	
 	@property
 	def s_norm(self):
