@@ -94,9 +94,14 @@ def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_n
 	return triggers
 
 class CoincidenceMeasurementBureaucrat:
-	def __init__(self, path_to_measurement_directory):
+	def __init__(self, path_to_measurement_directory = ''):
+		
+		if path_to_measurement_directory == '': # Get it automatically.
+			path_to_measurement_directory = os.getcwd().replace('/scripts', '')
 		if path_to_measurement_directory[-1] == '/':
 			path_to_measurement_directory = path_to_measurement_directory[:-1]
+		if not os.path.isdir(path_to_measurement_directory):
+			raise ValueError('Wrong value for <path_to_measurement_directory>, it is not a directory.')
 		self.path_to_measurement_directory = path_to_measurement_directory
 	
 	@property
@@ -112,11 +117,11 @@ class CoincidenceMeasurementBureaucrat:
 		return self.path_to_measurement_directory + '/processed data'
 	
 	@property
-	def parsed_signal_attributes_file_path(self):
+	def parsed_attributes_individual_signals_file_path(self):
 		return self.processed_data_dir + '/parsed signal attributes.txt'
 	
 	def save_parsed_attributes_individual_signals(self, triggers):
-		with open(self.parsed_signal_attributes_file_path, 'w') as ofile:
+		with open(self.parsed_attributes_individual_signals_file_path, 'w') as ofile:
 			print('# Trigger number\tAmplitude S1 (V)\tNoise RMS S1 (V)\tRisetime S1 (s)\tAmplitude S2 (V)\tNoise RMS S2 (V)\tRisetime S2 (s)', file = ofile)
 			for trig in triggers:
 				line = str(trig['trigger number'])
@@ -133,6 +138,22 @@ class CoincidenceMeasurementBureaucrat:
 						raise ValueError('I cannot calculate the parameters of the signal for ' + s + ' in trigger number ' + str(trig['trigger number']) + ' because it might be a crappy one or just Wi-Fi noise. Plot it and check, please...')
 				line = line[:-1]
 				print(line, file = ofile)
+	
+	def read_parsed_attributes_individual_signals(self):
+		try:
+			data = np.genfromtxt(self.parsed_attributes_individual_signals_file_path).transpose()
+		except OSError:
+			raise OSError('File ' + self.parsed_attributes_individual_signals_file_path + ' cannot be opened. Before attempting to read the parsed attributes you must save them!')
+		return {
+			'trigger number': data[0].astype(np.int),
+			'amplitude 1': data[1],
+			'noise 1': data[2],
+			'risetime 1': data[3],
+			'amplitude 2': data[4],
+			'noise 2': data[5],
+			'risetime 2': data[6],
+		}
+		
 	
 	def read_raw_data(self, trigger_numbers = []):
 		return read_coincidence_waveforms_Lecroy_WaveRunner_9254M(self.raw_data_dir, trigger_numbers)
