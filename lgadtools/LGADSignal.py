@@ -40,6 +40,8 @@ class LGADSignal(Signal):
 			return False
 		if self.risetime <= 0:
 			return False
+		if self.noise_std == 0:
+			return False
 		return True
 	
 	@property
