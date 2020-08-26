@@ -104,12 +104,15 @@ class CoincidenceMeasurementBureaucrat:
 				line = str(trig['trigger number'])
 				line += '\t'
 				for s in ['sensor 1', 'sensor 2']:
-					line += str(trig[s].amplitude)
-					line += '\t'
-					line += str(trig[s].noise_std)
-					line += '\t'
-					line += str(trig[s].risetime)
-					line += '\t'
+					try:
+						line += str(trig[s].amplitude)
+						line += '\t'
+						line += str(trig[s].noise_std)
+						line += '\t'
+						line += str(trig[s].risetime)
+						line += '\t'
+					except:
+						raise ValueError('I cannot calculate the parameters of the signal for ' + s + ' in trigger number ' + str(trig['trigger number']) + ' because it might be a crappy one or just Wi-Fi noise. Plot it and check, please...')
 				line = line[:-1]
 				print(line, file = ofile)
 	
