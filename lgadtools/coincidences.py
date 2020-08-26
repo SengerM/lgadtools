@@ -28,6 +28,24 @@ class CoincidenceTrigger:
 				raise KeyError('If you specify a string it must end either in 1 or 2 or be "trigger number"')
 		else:
 			raise KeyError('The "key" must be either an int or a string')
+	
+	@property
+	def ugly(self):
+		return not (self.S1.worth and self.S2.worth)
+	
+	def verbose_plot(self):
+		fig, ax = plt.subplots()
+		for sensor in ['Sensor 1', 'Sensor 2']:
+			ax.plot(
+				self[sensor].t,
+				self[sensor].s,
+				label = sensor,
+			)
+			ax.set_xlabel('Time (s)')
+			ax.set_ylabel('Amplitude (V)')
+			ax.legend()
+			fig.suptitle('Trigger # ' + str(self.trigger_number))
+		plt.show()
 
 def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_numbers = []):
 	# C2--Trace--00106.txt
@@ -118,15 +136,3 @@ class CoincidenceMeasurementBureaucrat:
 	
 	def read_raw_data(self, trigger_numbers = []):
 		return read_coincidence_waveforms_Lecroy_WaveRunner_9254M(self.raw_data_dir, trigger_numbers)
-
-	def verbose_plot_raw_data(self, trigger: CoincidenceTrigger):
-		fig, ax = plt.subplots()
-		for sensor in ['Sensor 1', 'Sensor 2']:
-			ax.plot(
-				trigger[sensor].t,
-				trigger[sensor].s,
-				label = sensor,
-			)
-			ax.set_xlabel('Time (s)')
-			ax.set_ylabel('Amplitude (V)')
-		plt.show()
