@@ -27,12 +27,12 @@ class Sensor1Sensor2StuffContainer:
 	
 	def __getitem__(self, key):
 		if isinstance(key, int):
-			if key == 1:
+			if key == 0:
 				return self.S1_stuff
-			elif key == 2:
+			elif key == 1:
 				return self.S2_stuff
 			else: 
-				raise KeyError('If you pass an integer it must be 1 or 2')
+				raise KeyError('If you pass an integer it must be 0 or 1')
 		elif isinstance(key, str):
 			if '1' in key:
 				return self.S1_stuff
