@@ -147,6 +147,7 @@ class CoincidenceMeasurementBureaucrat:
 		os.mkdir(self.path_to_measurement_directory)
 		os.mkdir(self.raw_data_dir)
 		os.mkdir(self.processed_data_dir)
+		os.mkdir(self.path_to_measurement_directory + '/scripts')
 		with open(self.metadata_file_path, 'w') as ofile:
 			print(
 				f'''Name: {measurement_name}
