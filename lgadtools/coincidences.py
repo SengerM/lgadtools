@@ -120,6 +120,16 @@ class CoincidenceMeasurementBureaucrat:
 	def parsed_attributes_individual_signals_file_path(self):
 		return self.processed_data_dir + '/parsed signal attributes.txt'
 	
+	@property
+	def nice_trigger_numbers_list_file_path(self):
+		return self.processed_data_dir + '/nice trigger numbers list.txt'
+	
+	def save_nice_trigger_numbers_list(self, trigger_numbers: list):
+		with open(self.nice_trigger_numbers_list_file_path, 'w') as ofile:
+			print('# List of "nice trigger numbers" obtained after throwing away garbage triggers.', file = ofile)
+			for t in trigger_numbers:
+				print(t, file = ofile)
+	
 	def save_parsed_attributes_individual_signals(self, triggers):
 		with open(self.parsed_attributes_individual_signals_file_path, 'w') as ofile:
 			print('# Trigger number\tAmplitude S1 (V)\tNoise RMS S1 (V)\tRisetime S1 (s)\tAmplitude S2 (V)\tNoise RMS S2 (V)\tRisetime S2 (s)', file = ofile)
