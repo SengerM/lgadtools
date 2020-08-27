@@ -8,14 +8,16 @@ __METADATA_FILE_TEMPLATE__ = '''Name: <Name of the measurement> (e.g. The best L
 
 Description: <Some comment on your measurement> (e.g. Today it was raining and the humidity was too high)
 
-Devices:
+Devices: (List the devices in ascending order of oscilloscope channel number)
   <Device 1 name> (e.g. W3-DB19):
     Bias voltage: <voltage> (e.g. 90 V)
-    Connected to osciloscope: <channel> (e.g. CH3)
+    Connected to oscilloscope: <channel> (e.g. CH2)
+    (Add your own fields here)
   
   <Device 1 name> (e.g. W3-DB31):
     Bias voltage: <voltage> (e.g. 80 V)
-    Connected to osciloscope: <channel> (e.g. CH2)
+    Connected to oscilloscope: <channel> (e.g. CH3)
+    (Add your own fields here)
 '''
 
 class Sensor1Sensor2StuffContainer:
