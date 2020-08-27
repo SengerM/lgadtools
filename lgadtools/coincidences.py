@@ -250,4 +250,6 @@ class CoincidenceMeasurementBureaucrat:
 	
 	def save_CFD_time_delta_file(self, CFD: int, time_deltas: list):
 		with open(self.CFD_time_delta_file_path, 'w') as ofile:
-			print(f'# Time deltas at CFD = {CFD:02} % for measurement ')
+			print(f'# Time deltas at CFD = {CFD:02} % for measurement "' self.measurement_name + '"', file = ofile)
+			for Dt in time_deltas:
+				print(Dt, file = ofile)
