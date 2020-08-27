@@ -158,6 +158,15 @@ class CoincidenceMeasurementBureaucrat:
 			for t in trigger_numbers:
 				print(t, file = ofile)
 	
+	def read_nice_trigger_numbers_list_file(self):
+		trigs = []
+		with open(self.nice_trigger_numbers_list_file_path, 'r') as ifile:
+			for line in ifile:
+				if line[0] == '#':
+					continue
+				trigs.append(int(line))
+		return trigs
+	
 	def save_parsed_attributes_individual_signals(self, triggers):
 		with open(self.parsed_attributes_individual_signals_file_path, 'w') as ofile:
 			print('# Trigger number\tAmplitude S1 (V)\tNoise RMS S1 (V)\tRisetime S1 (s)\tAmplitude S2 (V)\tNoise RMS S2 (V)\tRisetime S2 (s)', file = ofile)
@@ -194,6 +203,8 @@ class CoincidenceMeasurementBureaucrat:
 		
 	
 	def read_raw_data(self, trigger_numbers = []):
+		if isinstance(trigger_numbers, int):
+			return self.read_raw_data([trigger_numbers])
 		return read_coincidence_waveforms_Lecroy_WaveRunner_9254M(self.raw_data_dir, trigger_numbers)
 	
 	def read_metadata_file(self):
@@ -220,5 +231,23 @@ class CoincidenceMeasurementBureaucrat:
 				self.__devices_names = Sensor1Sensor2StuffContainer(list(metadata['Devices'].keys())[0], list(metadata['Devices'].keys())[1])
 				return self.__devices_names
 	
+	@property
+	def measurement_name(self):
+		if hasattr(self, '__measurement_name'):
+			return self.__measurement_name
+		else:
+			name = self.read_metadata_file().get('Name')
+			self.__measurement_name = name if name != None else 'Unknown'
+			return self.__measurement_name
+	
 	def print_metadata_file_template(self):
 		print(__METADATA_FILE_TEMPLATE__)
+	
+	def CFD_time_delta_file_path(self, CFD: int):
+		if not isinstance(CFD, int) and not 0 < CFD < 99:
+			raise ValueError('<CFD> must be an integer number bounded between 0 and 99')
+		return self.processed_data_dir + f'/time deltas at CFD files/CFD {CFD:02} %.txt'
+	
+	def save_CFD_time_delta_file(self, CFD: int, time_deltas: list):
+		with open(self.CFD_time_delta_file_path, 'w') as ofile:
+			print(f'# Time deltas at CFD = {CFD:02} % for measurement ')
