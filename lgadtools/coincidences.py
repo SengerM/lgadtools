@@ -18,6 +18,32 @@ Devices:
     Connected to osciloscope: <channel> (e.g. CH2)
 '''
 
+class Sensor1Sensor2StuffContainer:
+	def __init__(self, S1_stuff, S2_stuff):
+		self.S1_stuff = S1_stuff
+		self.S2_stuff = S2_stuff
+	
+	def __getitem__(self, key):
+		if isinstance(key, int):
+			if key == 1:
+				return self.S1_stuff
+			elif key == 2:
+				return self.S2_stuff
+			else: 
+				raise KeyError('If you pass an integer it must be 1 or 2')
+		elif isinstance(key, str):
+			if '1' in key:
+				return self.S1_stuff
+			elif '2' in key:
+				return self.S2_stuff
+			else:
+				raise KeyError('If you specify a string it must have either in "1" or "2" within it')
+		else:
+			raise KeyError('The "key" must be either an int or a string')
+	
+	def __str__(self):
+		return '[1: ' + str(self.S1_stuff) + ', 2: ' + str(self.S2_stuff) + ']'
+
 class CoincidenceTrigger:
 	def __init__(self, trigger_number: int, S1: LGADSignal, S2: LGADSignal):
 		self.trigger_number = trigger_number
@@ -193,15 +219,19 @@ class CoincidenceMeasurementBureaucrat:
 	
 	@property
 	def devices_names(self):
-		metadata_file_exists = True
-		try:
-			metadata = self.read_metadata_file()
-		except FileNotFoundError:
-			metadata_file_exists = False
-		if metadata_file_exists == False or metadata.get('Devices') == None:
-			return ['Unknown sensor names']*2
+		if hasattr(self, '__devices_names'):
+			return self.__devices_names
 		else:
-			return list(metadata['Devices'].keys())
+			metadata_file_exists = True
+			try:
+				metadata = self.read_metadata_file()
+			except FileNotFoundError:
+				metadata_file_exists = False
+			if metadata_file_exists == False or metadata.get('Devices') == None:
+				return Sensor1Sensor2StuffContainer('Unknown', 'Unknown')
+			else:
+				self.__devices_names = Sensor1Sensor2StuffContainer(list(metadata['Devices'].keys())[0], list(metadata['Devices'].keys())[1])
+				return self.__devices_names
 	
 	def print_metadata_file_template(self):
 		print(__METADATA_FILE_TEMPLATE__)
