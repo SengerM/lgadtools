@@ -123,7 +123,8 @@ def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_n
 
 class CoincidenceMeasurementBureaucrat:
 	def __init__(self, path_to_measurement_directory = ''):
-		
+		if path_to_measurement_directory == None:
+			return
 		if path_to_measurement_directory == '': # Get it automatically.
 			path_to_measurement_directory = os.getcwd().replace('/scripts', '')
 		if path_to_measurement_directory[-1] == '/':
@@ -132,16 +133,43 @@ class CoincidenceMeasurementBureaucrat:
 			raise ValueError('Wrong value for <path_to_measurement_directory>, it is not a directory.')
 		self.path_to_measurement_directory = path_to_measurement_directory
 	
+	def create_directory_structure(self, base_path=None, measurement_name=None, devices_names=[None, None]):
+		if base_path == None:
+			base_path = os.getcwd()
+		if measurement_name == None:
+			measurement_name = input('Measurement name? ')
+		if os.path.isdir(base_path + '/' + measurement_name):
+			raise ValueError('A measurement named "' + measurement_name + '" already exists in ' + base_path)
+		for idx,dev_name in enumerate(devices_names):
+			if dev_name == None:
+				devices_names[idx] = input(f'Device {idx+1} name? ')
+		self.path_to_measurement_directory = base_path + '/' + measurement_name
+		os.mkdir(self.path_to_measurement_directory)
+		os.mkdir(self.raw_data_dir)
+		os.mkdir(self.processed_data_dir)
+		with open(self.metadata_file_path, 'w') as ofile:
+			print(
+				f'''Name: {measurement_name}
+
+Description: ?
+
+Devices:
+  {devices_names[0]}:
+    Bias voltage: ?
+    Connected to oscilloscope: ?
+
+  {devices_names[1]}:
+    Bias voltage: ?
+    Connected to oscilloscope: ?''', 
+				file = ofile
+			)
+	
 	@property
 	def raw_data_dir(self):
-		if 'raw data' not in os.listdir(self.path_to_measurement_directory):
-			raise ValueError('There is no "raw data" directory in "' + self.path_to_measurement_directory + '"')
 		return self.path_to_measurement_directory + '/raw data'
 	
 	@property
 	def processed_data_dir(self):
-		if 'processed data' not in os.listdir(self.path_to_measurement_directory):
-			os.mkdir(self.path_to_measurement_directory + '/processed data')
 		return self.path_to_measurement_directory + '/processed data'
 	
 	@property
@@ -207,9 +235,13 @@ class CoincidenceMeasurementBureaucrat:
 			return self.read_raw_data([trigger_numbers])
 		return read_coincidence_waveforms_Lecroy_WaveRunner_9254M(self.raw_data_dir, trigger_numbers)
 	
+	@property
+	def metadata_file_path(self):
+		return self.path_to_measurement_directory + '/metadata.yaml'
+	
 	def read_metadata_file(self):
 		try:
-			with open(self.path_to_measurement_directory + '/metadata.yaml') as ifile:
+			with open(self.metadata_file_path) as ifile:
 				metadata = yaml.safe_load(ifile)
 		except FileNotFoundError:
 			raise FileNotFoundError('There is no "metadata.yaml" file in ' + self.path_to_measurement_directory)
@@ -250,6 +282,6 @@ class CoincidenceMeasurementBureaucrat:
 	
 	def save_CFD_time_delta_file(self, CFD: int, time_deltas: list):
 		with open(self.CFD_time_delta_file_path, 'w') as ofile:
-			print(f'# Time deltas at CFD = {CFD:02} % for measurement "' self.measurement_name + '"', file = ofile)
+			print(f'# Time deltas at CFD = {CFD:02} % for measurement "' + self.measurement_name + '"', file = ofile)
 			for Dt in time_deltas:
 				print(Dt, file = ofile)
