@@ -49,28 +49,13 @@ class Sensor1Sensor2StuffContainer:
 class CoincidenceTrigger:
 	def __init__(self, trigger_number: int, S1: LGADSignal, S2: LGADSignal):
 		self.trigger_number = trigger_number
-		self.S1 = S1
-		self.S2 = S2
+		self.triggers = Sensor1Sensor2StuffContainer(S1, S2)
 	
 	def __getitem__(self, key):
-		if isinstance(key, int):
-			if key == 1:
-				return self.S1
-			elif key == 2:
-				return self.S2
-			else: 
-				raise KeyError('If you pass an integer it must be 1 or 2')
-		elif isinstance(key, str):
-			if key[-1] == '1':
-				return self.S1
-			elif key[-1] == '2':
-				return self.S2
-			elif key.lower() == 'trigger number':
-				return self.trigger_number
-			else:
-				raise KeyError('If you specify a string it must end either in 1 or 2 or be "trigger number"')
+		if key.lower() == 'trigger number':
+			return self.trigger_number
 		else:
-			raise KeyError('The "key" must be either an int or a string')
+			return self.triggers[key]
 	
 	@property
 	def ugly(self):
