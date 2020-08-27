@@ -2,6 +2,21 @@ import os
 import numpy as np
 from .LGADSignal import LGADSignal
 import matplotlib.pyplot as plt
+import yaml
+
+__METADATA_FILE_TEMPLATE__ = '''Name: <Name of the measurement> (e.g. The best LGAD detectors you have seen
+
+Description: <Some comment on your measurement> (e.g. Today it was raining and the humidity was too high)
+
+Devices:
+  <Device 1 name> (e.g. W3-DB19):
+    Bias voltage: <voltage> (e.g. 90 V)
+    Connected to osciloscope: <channel> (e.g. CH3)
+  
+  <Device 1 name> (e.g. W3-DB31):
+    Bias voltage: <voltage> (e.g. 80 V)
+    Connected to osciloscope: <channel> (e.g. CH2)
+'''
 
 class CoincidenceTrigger:
 	def __init__(self, trigger_number: int, S1: LGADSignal, S2: LGADSignal):
@@ -167,3 +182,26 @@ class CoincidenceMeasurementBureaucrat:
 	
 	def read_raw_data(self, trigger_numbers = []):
 		return read_coincidence_waveforms_Lecroy_WaveRunner_9254M(self.raw_data_dir, trigger_numbers)
+	
+	def read_metadata_file(self):
+		try:
+			with open(self.path_to_measurement_directory + '/metadata.yaml') as ifile:
+				metadata = yaml.safe_load(ifile)
+		except FileNotFoundError:
+			raise FileNotFoundError('There is no "metadata.yaml" file in ' + self.path_to_measurement_directory)
+		return metadata
+	
+	@property
+	def devices_names(self):
+		metadata_file_exists = True
+		try:
+			metadata = self.read_metadata_file()
+		except FileNotFoundError:
+			metadata_file_exists = False
+		if metadata_file_exists == False or metadata.get('Devices') == None:
+			return ['Unknown sensor names']*2
+		else:
+			return list(metadata['Devices'].keys())
+	
+	def print_metadata_file_template(self):
+		print(__METADATA_FILE_TEMPLATE__)
