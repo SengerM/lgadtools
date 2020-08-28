@@ -49,31 +49,44 @@ class Sensor1Sensor2StuffContainer:
 class CoincidenceTrigger:
 	def __init__(self, trigger_number: int, S1: LGADSignal, S2: LGADSignal):
 		self.trigger_number = trigger_number
-		self.triggers = Sensor1Sensor2StuffContainer(S1, S2)
+		self.signals = Sensor1Sensor2StuffContainer(S1, S2)
 	
 	def __getitem__(self, key):
 		if key.lower() == 'trigger number':
 			return self.trigger_number
 		else:
-			return self.triggers[key]
+			return self.signals[key]
 	
 	@property
 	def ugly(self):
-		return not (self.S1.worth and self.S2.worth)
+		return not (self.signals[0].worth and self.signals[1].worth)
 	
-	def verbose_plot(self):
-		fig, ax = plt.subplots()
-		for sensor in ['Sensor 1', 'Sensor 2']:
-			ax.plot(
-				self[sensor].t,
-				self[sensor].s,
-				label = sensor,
+	def verbose_plot(self, fig = None):
+		if fig == None:
+			fig, ax = plt.subplots()
+			for sensor in ['Sensor 1', 'Sensor 2']:
+				ax.plot(
+					self.signals[sensor].t,
+					self.signals[sensor].s,
+					label = sensor,
+				)
+				ax.set_xlabel('Time (s)')
+				ax.set_ylabel('Amplitude (V)')
+				ax.legend()
+				fig.suptitle('Trigger ' + str(self.trigger_number))
+			plt.show()
+		else: # Assuming a "myplotlib" fig object. See https://github.com/SengerM/myplotlib.
+			for sensor in ['Sensor 1', 'Sensor 2']:
+				fig.plot(
+					self.signals[sensor].t,
+					self.signals[sensor].s,
+					label = sensor,
+				)
+			fig.set(
+				xlabel = 'Time (s)',
+				ylabel = 'Amplitude (V)',
+				title = 'Trigger ' + str(self.trigger_number)
 			)
-			ax.set_xlabel('Time (s)')
-			ax.set_ylabel('Amplitude (V)')
-			ax.legend()
-			fig.suptitle('Trigger # ' + str(self.trigger_number))
-		plt.show()
 
 def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_numbers = []):
 	# C2--Trace--00106.txt
@@ -122,48 +135,18 @@ def read_coincidence_waveforms_Lecroy_WaveRunner_9254M(directory: str, trigger_n
 	return triggers
 
 class CoincidenceMeasurementBureaucrat:
-	def __init__(self, path_to_measurement_directory = ''):
-		if path_to_measurement_directory == None:
-			return
-		if path_to_measurement_directory == '': # Get it automatically.
+	def __init__(self, path_to_measurement_directory=None):
+		if path_to_measurement_directory == None: # Assume we are working inside the "scripts" directory of an existing measurement and get it directly.
 			path_to_measurement_directory = os.getcwd().replace('/scripts', '')
+			if not os.path.isdir(path_to_measurement_directory):
+				raise ValueError('You did not specify a <path_to_measurement_directory> and I assumed you were working inside the "scripts" directory of an existing measurement, but this is not the case... Please check.')
+		if not isinstance(path_to_measurement_directory, str):
+			raise TypeError('<path_to_measurement_directory> must be a string')
 		if path_to_measurement_directory[-1] == '/':
 			path_to_measurement_directory = path_to_measurement_directory[:-1]
 		if not os.path.isdir(path_to_measurement_directory):
-			raise ValueError('Wrong value for <path_to_measurement_directory>, it is not a directory.')
+			raise ValueError('The directory you provided in <path_to_measurement_directory> is not a directory.')
 		self.path_to_measurement_directory = path_to_measurement_directory
-	
-	def create_directory_structure(self, base_path=None, measurement_name=None, devices_names=[None, None]):
-		if base_path == None:
-			base_path = os.getcwd()
-		if measurement_name == None:
-			measurement_name = input('Measurement name? ')
-		if os.path.isdir(base_path + '/' + measurement_name):
-			raise ValueError('A measurement named "' + measurement_name + '" already exists in ' + base_path)
-		for idx,dev_name in enumerate(devices_names):
-			if dev_name == None:
-				devices_names[idx] = input(f'Device {idx+1} name? ')
-		self.path_to_measurement_directory = base_path + '/' + measurement_name
-		os.mkdir(self.path_to_measurement_directory)
-		os.mkdir(self.raw_data_dir)
-		os.mkdir(self.processed_data_dir)
-		os.mkdir(self.path_to_measurement_directory + '/scripts')
-		with open(self.metadata_file_path, 'w') as ofile:
-			print(
-				f'''Name: {measurement_name}
-
-Description: ?
-
-Devices:
-  {devices_names[0]}:
-    Bias voltage: ?
-    Connected to oscilloscope: ?
-
-  {devices_names[1]}:
-    Bias voltage: ?
-    Connected to oscilloscope: ?''', 
-				file = ofile
-			)
 	
 	@property
 	def raw_data_dir(self):
@@ -180,6 +163,10 @@ Devices:
 	@property
 	def nice_trigger_numbers_list_file_path(self):
 		return self.processed_data_dir + '/nice trigger numbers list.txt'
+	
+	@property
+	def scripts_dir(self):
+		return self.path_to_measurement_directory + '/scripts'
 	
 	def save_nice_trigger_numbers_list(self, trigger_numbers: list):
 		with open(self.nice_trigger_numbers_list_file_path, 'w') as ofile:
