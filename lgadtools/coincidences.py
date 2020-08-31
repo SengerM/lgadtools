@@ -52,7 +52,7 @@ class CoincidenceTrigger:
 		self.signals = Sensor1Sensor2StuffContainer(S1, S2)
 	
 	def __getitem__(self, key):
-		if key.lower() == 'trigger number':
+		if key.lower() in ['trigger number', 'number']:
 			return self.trigger_number
 		else:
 			return self.signals[key]
@@ -139,7 +139,7 @@ class CoincidenceMeasurementBureaucrat:
 		if path_to_measurement_directory == None: # Assume we are working inside the "scripts" directory of an existing measurement and get it directly.
 			path_to_measurement_directory = os.getcwd().replace('/scripts', '')
 			if not os.path.isdir(path_to_measurement_directory):
-				raise ValueError('You did not specify a <path_to_measurement_directory> and I assumed you were working inside the "scripts" directory of an existing measurement, but this is not the case... Please check.')
+				raise ValueError('You did not specified a <path_to_measurement_directory> and I assumed you were working inside the "scripts" directory of an existing measurement, but this is not the case... Please check.')
 		if not isinstance(path_to_measurement_directory, str):
 			raise TypeError('<path_to_measurement_directory> must be a string')
 		if path_to_measurement_directory[-1] == '/':
@@ -150,11 +150,11 @@ class CoincidenceMeasurementBureaucrat:
 	
 	@property
 	def raw_data_dir(self):
-		return self.path_to_measurement_directory + '/raw data'
+		return self.path_to_measurement_directory + '/data/raw'
 	
 	@property
 	def processed_data_dir(self):
-		return self.path_to_measurement_directory + '/processed data'
+		return self.path_to_measurement_directory + '/data/processed'
 	
 	@property
 	def parsed_attributes_individual_signals_file_path(self):
