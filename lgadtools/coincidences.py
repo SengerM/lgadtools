@@ -168,6 +168,10 @@ class CoincidenceMeasurementBureaucrat:
 	def scripts_dir(self):
 		return self.path_to_measurement_directory + '/scripts'
 	
+	@property
+	def pics_dir(self):
+		return self.path_to_measurement_directory + '/pics'
+	
 	def save_nice_trigger_numbers_list(self, trigger_numbers: list):
 		with open(self.nice_trigger_numbers_list_file_path, 'w') as ofile:
 			print('# List of "nice trigger numbers" obtained after throwing away garbage triggers.', file = ofile)
@@ -208,13 +212,10 @@ class CoincidenceMeasurementBureaucrat:
 		except OSError:
 			raise OSError('File ' + self.parsed_attributes_individual_signals_file_path + ' cannot be opened. Before attempting to read the parsed attributes you must save them!')
 		return {
-			'trigger number': data[0].astype(np.int),
-			'amplitude 1': data[1],
-			'noise 1': data[2],
-			'risetime 1': data[3],
-			'amplitude 2': data[4],
-			'noise 2': data[5],
-			'risetime 2': data[6],
+			'trigger numbers': data[0].astype(np.int),
+			'amplitudes': Sensor1Sensor2StuffContainer(data[1],data[4]),
+			'noises': Sensor1Sensor2StuffContainer(data[2],data[5]),
+			'risetimes': Sensor1Sensor2StuffContainer(data[3],data[6]),
 		}
 		
 	
