@@ -36,7 +36,7 @@ class LGADSignal(Signal):
 	def worth(self):
 		try:
 			self.rise_window_indices
-		except: # If this is noise or some other crap but there is no LGAD pulse at all.
+		except:
 			return False
 		if self.risetime <= 0:
 			return False
