@@ -4,6 +4,24 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy import interpolate
 
+def is_nice_lgad_shape(samples):
+	FIRST_DIVISION_POINT = 2/5
+	SECOND_DIVISION_POINT = 3/5
+	nice_shape = True
+	first_part = np.array(samples[:int(np.floor(len(samples)*FIRST_DIVISION_POINT))])
+	second_part = np.array(samples[int(np.ceil(len(samples)*FIRST_DIVISION_POINT)):int(np.floor(len(samples)*SECOND_DIVISION_POINT))])
+	third_part = np.array(samples[int(np.ceil(len(samples)*SECOND_DIVISION_POINT)):])
+	if first_part.std() > 0.5*second_part.std():
+		nice_shape = False
+	if first_part.mean() > second_part.mean():
+		nice_shape = False
+	# ~ if second_part.std() > 3*second_part.mean():
+		# ~ nice_shape = False
+	# ~ nonlinear = np.abs(samples)**10*samples
+	# ~ if nonlinear.mean() > .3*nonlinear.std():
+		# ~ nice_shape = False
+	return nice_shape
+
 class Signal:
 	# Implements a signal that was sampled.
 	def __init__(self, time, samples):
@@ -34,6 +52,8 @@ class LGADSignal(Signal):
 
 	@property
 	def worth(self):
+		if not is_nice_lgad_shape(self.s - self.baseline):
+			return False
 		try:
 			self.rise_window_indices
 		except:
