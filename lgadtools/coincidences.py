@@ -264,13 +264,22 @@ class CoincidenceMeasurementBureaucrat:
 	def print_metadata_file_template(self):
 		print(__METADATA_FILE_TEMPLATE__)
 	
-	def CFD_time_delta_file_path(self, CFD: int):
+	@property
+	def CFD_time_delta_files_dir(self):
+		return self.processed_data_dir + '/time deltas at CFD files'
+	
+	def CFD_time_delta_file_name(self, CFD: int):
 		if not isinstance(CFD, int) and not 0 < CFD < 99:
 			raise ValueError('<CFD> must be an integer number bounded between 0 and 99')
-		return self.processed_data_dir + f'/time deltas at CFD files/CFD {CFD:02} %.txt'
+		return f'CFD{CFD:02}%.txt'
 	
-	def save_CFD_time_delta_file(self, CFD: int, time_deltas: list):
-		with open(self.CFD_time_delta_file_path, 'w') as ofile:
-			print(f'# Time deltas at CFD = {CFD:02} % for measurement "' + self.measurement_name + '"', file = ofile)
-			for Dt in time_deltas:
-				print(Dt, file = ofile)
+	def save_CFD_time_delta_file(self, CFD: int, trigger_numbers: list, time_deltas: list):
+		os.makedirs(self.CFD_time_delta_files_dir, exist_ok = True)
+		with open(self.CFD_time_delta_files_dir + '/' + self.CFD_time_delta_file_name(CFD), 'w') as ofile:
+			print(f'# Trigger numbers and time deltas (in seconds) at CFD = {CFD:02} % for measurement "' + self.measurement_name + '"', file = ofile)
+			for tn,Dt in zip(trigger_numbers,time_deltas):
+				print(f'{tn}\t{Dt}', file = ofile)
+	
+	def read_CFD_time_delta_file(self, CFD: int):
+		data = np.genfromtxt(self.CFD_time_delta_files_dir + '/' + self.CFD_time_delta_file_name(CFD)).transpose()
+		return {'trigger numbers': data[0], 'time deltas': data[1]}
