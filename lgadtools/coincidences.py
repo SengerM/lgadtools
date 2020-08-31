@@ -52,7 +52,7 @@ class CoincidenceTrigger:
 		self.signals = Sensor1Sensor2StuffContainer(S1, S2)
 	
 	def __getitem__(self, key):
-		if key.lower() in ['trigger number', 'number']: #
+		if key.lower() in ['trigger number', 'number']:
 			return self.trigger_number
 		else:
 			return self.signals[key]
