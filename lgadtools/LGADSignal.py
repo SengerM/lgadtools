@@ -135,10 +135,10 @@ class LGADSignal(Signal):
 				rising_from_low = False
 				rising_to_high = False
 				continue
-			if not between[k-1] and below_low[k-1]:
+			if between[k] and below_low[k-1]:
 				rising_from_low = True
 				k_start_rise = k
-			if not between[k+1] and above_high[k+1]:
+			if between[k] and above_high[k+1]:
 				rising_to_high = True
 				k_stop_rise = k
 			if rising_from_low and rising_to_high:
@@ -175,10 +175,10 @@ class LGADSignal(Signal):
 			return self.rise_window_time_value
 		else:
 			k_start, k_stop = self.rise_window_indices
-			slope = (self.t[k_start]-self.t[k_start-1])/(self.s[k_start]-self.s[k_start-1])
-			t_start_rise = self.t[k_start-1] + (.1*self.amplitude - self.s[k_start-1])*slope
-			slope = (self.t[k_stop+1]-self.t[k_stop])/(self.s[k_stop+1]-self.s[k_stop])
-			t_stop_rise = self.t[k_stop] + (.9*self.amplitude - self.s[k_stop])*slope
+			k0 = k_start-1 + 1/(self.s[k_start]-self.s[k_start-1])*(.1*self.amplitude+self.baseline-self.s[k_start-1])
+			t_start_rise = self.t[k_start-1] + (self.t[k_start]-self.t[k_start-1])/1*(k0-k_start+1)
+			k0 = k_stop + 1/(self.s[k_stop+1]-self.s[k_stop])*(.9*self.amplitude+self.baseline-self.s[k_stop])
+			t_stop_rise = self.t[k_stop] + (self.t[k_stop+1]-self.t[k_stop])/1*(k0-k_stop)
 			self.rise_window_time_value = (t_start_rise, t_stop_rise)
 			return self.rise_window_times
 	
