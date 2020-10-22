@@ -20,6 +20,7 @@ def is_nice_lgad_shape(samples):
 	# ~ nonlinear = np.abs(samples)**10*samples
 	# ~ if nonlinear.mean() > .3*nonlinear.std():
 		# ~ nice_shape = False
+	print(f'Signal shape is good? {nice_shape}')
 	return nice_shape
 
 class Signal:
@@ -209,8 +210,59 @@ class LGADSignal(Signal):
 		del(_fig)
 		del(_ax)
 	
-	def plot_with_analysis(self, ax):
-		plot_signal_analysis(self, ax)
+	def plot_myplotlib(self, fig):
+		# <fig> is a Figure object created with https://github.com/SengerM/myplotlib
+		fig.set(
+			xlabel = 'Time (s)',
+			ylabel = 'Amplitude (V)',
+		)
+		fig.plot(
+			self.t,
+			self.s,
+			label = 'Signal',
+			marker = '.',
+			color = (.4,.5,.8),
+		)
+		fig.plot(
+			[min(self.t), max(self.t)],
+			[self.baseline, self.baseline],
+			label = f'Baseline ({self.baseline:.2e} V)',
+			color = (0,0,0)
+		)
+		fig.plot(
+			[min(self.t), max(self.t)],
+			[self.baseline + self.noise_std, self.baseline + self.noise_std],
+			label = f'Noise ({self.noise_std:.2e} V)',
+			color = (.6,)*3,
+			linestyle = '--',
+		)
+		fig.plot(
+			[min(self.t), max(self.t)],
+			[self.baseline - self.noise_std, self.baseline - self.noise_std],
+			color = (.6,)*3,
+			linestyle = '--',
+		)
+		fig.plot(
+			[min(self.t) - (max(self.t)-min(self.t))*.01]*2,
+			[self.baseline, self.baseline + self.amplitude],
+			label = f'Amplitude ({self.amplitude:.2e} V)',
+			marker = '_',
+			color = (0,.6,0),
+		)
+		fig.plot(
+			[min(self.t), max(self.t)],
+			[self.baseline + self.amplitude]*2,
+			color = (0,0,0),
+			linestyle = '--',
+		)
+		fig.plot(
+			[self.rise_window_times[0], self.rise_window_times[1], self.rise_window_times[1], self.rise_window_times[0], self.rise_window_times[0]],
+			self.baseline + np.array([self.amplitude*.1, self.amplitude*.1, self.amplitude*.9, self.amplitude*.9, self.amplitude*.1]),
+			label = f'Rise time ({self.risetime:.2e} s)',
+			color = (.9,0,0),
+			alpha = .5,
+			linestyle = '--',
+		)
 		
 
 def plot_signal_analysis(signal: LGADSignal, ax):
