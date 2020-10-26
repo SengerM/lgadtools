@@ -98,6 +98,10 @@ class LGADSignal(Signal):
 			return self.noise_std
 	
 	@property
+	def noise(self):
+		return self.noise_std
+	
+	@property
 	def SNR(self):
 		# Returns the signal to noise ratio.
 		return self.amplitude/self.noise_std
