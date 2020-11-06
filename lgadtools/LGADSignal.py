@@ -20,7 +20,6 @@ def is_nice_lgad_shape(samples):
 	# ~ nonlinear = np.abs(samples)**10*samples
 	# ~ if nonlinear.mean() > .3*nonlinear.std():
 		# ~ nice_shape = False
-	print(f'Signal shape is good? {nice_shape}')
 	return nice_shape
 
 class Signal:
