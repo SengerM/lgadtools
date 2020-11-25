@@ -312,7 +312,7 @@ class LGADSignal(Signal):
 		# R: The proportionality factor to go from Volts to Ampere, i.e. the resistance.
 		# Threshold: Which part of the signal do we consider for calculating the charge. It is a percentage, e.g. threshold = 10 %. If no value is provided, the noise threshold is used.
 		if threshold == None:
-			threshold = (self.baseline+self.noise)/self.amplitude*100
+			threshold = self.noise/self.amplitude*100
 		k_start, k_stop = self.find_indices_over_threshold(threshold=threshold)
 		t_start, t_stop = self.find_times_over_threshold(threshold=threshold)
 		Q, *_ = integrate.quad(lambda t: (self.signal_at(time=t)-self.baseline)/R, t_start, t_stop)
