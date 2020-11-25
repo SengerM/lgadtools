@@ -2,7 +2,7 @@ import numpy as np
 import numbers
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from scipy import interpolate
+from scipy import interpolate, integrate
 
 def is_nice_lgad_shape(samples):
 	FIRST_DIVISION_POINT = 2/5
@@ -266,13 +266,15 @@ class LGADSignal(Signal):
 			alpha = .5,
 			linestyle = '--',
 		)
-		t_start, t_stop = self.find_times_over_threshold(25)
+		threshold = 10
+		t_start, t_stop = self.find_times_over_threshold(threshold)
 		fig.plot(
 			[t_start,t_stop],
-			2*[self.baseline+25/100*self.amplitude],
-			label = f'Time over 25 % ({t_stop-t_start:.2e} s)'
+			2*[self.baseline+threshold/100*self.amplitude],
+			label = f'Time over {threshold} % ({t_stop-t_start:.2e} s)',
+			linestyle = '--',
 		)
-	
+		
 	def find_indices_over_threshold(self, threshold=10):
 		# Threshold is a percentage.
 		if not 0 <= threshold <= 100:
@@ -296,7 +298,20 @@ class LGADSignal(Signal):
 		t_start = interpolate.interp1d([self.s[k_start-1],self.s[k_start]], [self.t[k_start-1],self.t[k_start]])(self.baseline + threshold/100*self.amplitude)
 		t_stop = interpolate.interp1d([self.s[k_stop],self.s[k_stop+1]], [self.t[k_stop],self.t[k_stop+1]])(self.baseline + threshold/100*self.amplitude)
 		return t_start, t_stop
-		
+	
+	def calculate_collected_charge(self, threshold=10):
+		k_start, k_stop = self.find_indices_over_threshold(threshold=threshold)
+		t_start, t_stop = self.find_times_over_threshold(threshold=threshold)
+		Q, *_ = integrate.quad(lambda t: self.signal_at(time=t)-self.baseline, t_start, t_stop)
+		return Q
+	
+	@property
+	def collected_charge(self):
+		if hasattr(self, 'collected_charge_value'):
+			return self.collected_charge_value
+		else:
+			self.collected_charge_value = self.calculate_collected_charge(threshold=0)
+			return self.collected_charge_value
 
 def plot_signal_analysis(signal: LGADSignal, ax):
 	ax.plot(
