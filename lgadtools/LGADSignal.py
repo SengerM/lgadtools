@@ -52,8 +52,8 @@ class LGADSignal(Signal):
 
 	@property
 	def worth(self):
-		if not is_nice_lgad_shape(self.s - self.baseline):
-			return False
+		# ~ if not is_nice_lgad_shape(self.s - self.baseline):
+			# ~ return False
 		try:
 			self.rise_window_indices
 		except:
@@ -266,6 +266,36 @@ class LGADSignal(Signal):
 			alpha = .5,
 			linestyle = '--',
 		)
+		t_start, t_stop = self.find_times_over_threshold(25)
+		fig.plot(
+			[t_start,t_stop],
+			2*[self.baseline+25/100*self.amplitude],
+			label = f'Time over 25 % ({t_stop-t_start:.2e} s)'
+		)
+	
+	def find_indices_over_threshold(self, threshold=10):
+		# Threshold is a percentage.
+		if not 0 <= threshold <= 100:
+			raise ValueError(f'<threshold> must be a percentage, i.e. a real number between 0 and 100. Received {threshold}.')
+		v_threshold = self.baseline + threshold/100*self.amplitude
+		k_top = np.argmax(self.s)
+		k_start = k_top
+		while True:
+			if self.s[k_start] < v_threshold:
+				break
+			k_start -= 1
+		k_stop = k_top
+		while True:
+			if self.s[k_stop] < v_threshold:
+				break
+			k_stop += 1
+		return k_start+1, k_stop-1
+	
+	def find_times_over_threshold(self, threshold=10):
+		k_start, k_stop = self.find_indices_over_threshold(threshold=threshold)
+		t_start = interpolate.interp1d([self.s[k_start-1],self.s[k_start]], [self.t[k_start-1],self.t[k_start]])(self.baseline + threshold/100*self.amplitude)
+		t_stop = interpolate.interp1d([self.s[k_stop],self.s[k_stop+1]], [self.t[k_stop],self.t[k_stop+1]])(self.baseline + threshold/100*self.amplitude)
+		return t_start, t_stop
 		
 
 def plot_signal_analysis(signal: LGADSignal, ax):
