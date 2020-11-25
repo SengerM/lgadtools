@@ -57,6 +57,13 @@ my_signal.s # Returns the samples_array.
 ```
 You can copy/paste the previous code in your Python interpreter to check how it works.
 
+![Signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.png)
+
+![Detail of signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example_detail.png)
+
+**[Click here to view the plot of the signal in more detail](https://htmlpreview.github.io/?https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.html)**
+
+
 ### TCTAnalyse Python wrapper
 
 ```
