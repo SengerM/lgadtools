@@ -219,13 +219,21 @@ class LGADSignal(Signal):
 			xlabel = 'Time (s)',
 			ylabel = 'Amplitude (V)',
 		)
+		Q, times = self.collected_charge()
 		fig.plot(
-			self.t,
-			self.s,
-			label = 'Signal',
-			marker = '.',
-			color = (.4,.5,.8),
+			times,
+			2*[self.baseline],
+			label = f'Collected charge ({Q:.2e} A.U.)',
+			color = (1,.5,0),
+			alpha = .3,
 		)
+		for k in np.argwhere((times[0]<=self.t)&(self.t<=times[1])).transpose()[0]:
+			fig.plot(
+				2*[self.t[k]],
+				[self.baseline,self.s[k]],
+				color = (1,.5,0),
+				alpha = .3,
+			)
 		fig.plot(
 			[min(self.t), max(self.t)],
 			[self.baseline, self.baseline],
@@ -246,33 +254,34 @@ class LGADSignal(Signal):
 			linestyle = '--',
 		)
 		fig.plot(
-			[min(self.t) - (max(self.t)-min(self.t))*.01]*2,
-			[self.baseline, self.baseline + self.amplitude],
+			[self.t[np.argmax(self.s)-9],self.t[np.argmax(self.s)+9]] + 2*[self.t[np.argmax(self.s)]] + [self.t[np.argmax(self.s)-9],self.t[np.argmax(self.s)+9]],
+			2*[self.baseline] + [self.baseline, self.baseline + self.amplitude] + 2*[self.baseline+self.amplitude],
 			label = f'Amplitude ({self.amplitude:.2e} V)',
-			marker = '_',
 			color = (0,.6,0),
-		)
-		fig.plot(
-			[min(self.t), max(self.t)],
-			[self.baseline + self.amplitude]*2,
-			color = (0,0,0),
-			linestyle = '--',
 		)
 		fig.plot(
 			[self.rise_window_times[0], self.rise_window_times[1], self.rise_window_times[1], self.rise_window_times[0], self.rise_window_times[0]],
 			self.baseline + np.array([self.amplitude*.1, self.amplitude*.1, self.amplitude*.9, self.amplitude*.9, self.amplitude*.1]),
 			label = f'Rise time ({self.risetime:.2e} s)',
-			color = (.9,0,0),
+			color = (1,0,0),
 			alpha = .5,
 			linestyle = '--',
 		)
-		threshold = 10
+		threshold = 20
 		t_start, t_stop = self.find_times_over_threshold(threshold)
 		fig.plot(
 			[t_start,t_stop],
 			2*[self.baseline+threshold/100*self.amplitude],
 			label = f'Time over {threshold} % ({t_stop-t_start:.2e} s)',
 			linestyle = '--',
+			color = (.8,.3,.8)
+		)
+		fig.plot(
+			self.t,
+			self.s,
+			label = 'Signal',
+			marker = '.',
+			color = (.4,.5,.8),
 		)
 		
 	def find_indices_over_threshold(self, threshold=10):
@@ -299,20 +308,16 @@ class LGADSignal(Signal):
 		t_stop = interpolate.interp1d([self.s[k_stop],self.s[k_stop+1]], [self.t[k_stop],self.t[k_stop+1]])(self.baseline + threshold/100*self.amplitude)
 		return t_start, t_stop
 	
-	def calculate_collected_charge(self, threshold=10):
+	def collected_charge(self, R=1, threshold=None):
+		# R: The proportionality factor to go from Volts to Ampere, i.e. the resistance.
+		# Threshold: Which part of the signal do we consider for calculating the charge. It is a percentage, e.g. threshold = 10 %. If no value is provided, the noise threshold is used.
+		if threshold == None:
+			threshold = (self.baseline+self.noise)/self.amplitude*100
 		k_start, k_stop = self.find_indices_over_threshold(threshold=threshold)
 		t_start, t_stop = self.find_times_over_threshold(threshold=threshold)
-		Q, *_ = integrate.quad(lambda t: self.signal_at(time=t)-self.baseline, t_start, t_stop)
-		return Q
+		Q, *_ = integrate.quad(lambda t: (self.signal_at(time=t)-self.baseline)/R, t_start, t_stop)
+		return Q, (t_start, t_stop)
 	
-	@property
-	def collected_charge(self):
-		if hasattr(self, 'collected_charge_value'):
-			return self.collected_charge_value
-		else:
-			self.collected_charge_value = self.calculate_collected_charge(threshold=0)
-			return self.collected_charge_value
-
 def plot_signal_analysis(signal: LGADSignal, ax):
 	ax.plot(
 		signal.t,
