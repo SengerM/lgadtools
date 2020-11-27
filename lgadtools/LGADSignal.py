@@ -219,7 +219,7 @@ class LGADSignal(Signal):
 			xlabel = 'Time (s)',
 			ylabel = 'Amplitude (V)',
 		)
-		Q, times = self.collected_charge()
+		Q, times = self.calculate_collected_charge()
 		fig.plot(
 			times,
 			2*[self.baseline],
@@ -302,13 +302,18 @@ class LGADSignal(Signal):
 			k_stop += 1
 		return k_start+1, k_stop-1
 	
-	def find_times_over_threshold(self, threshold=10):
+	def find_times_over_threshold(self, threshold=20):
 		k_start, k_stop = self.find_indices_over_threshold(threshold=threshold)
 		t_start = interpolate.interp1d([self.s[k_start-1],self.s[k_start]], [self.t[k_start-1],self.t[k_start]])(self.baseline + threshold/100*self.amplitude)
 		t_stop = interpolate.interp1d([self.s[k_stop],self.s[k_stop+1]], [self.t[k_stop],self.t[k_stop+1]])(self.baseline + threshold/100*self.amplitude)
 		return t_start, t_stop
 	
-	def collected_charge(self, R=1, threshold=None):
+	def time_over_threshold(self, threshold=20):
+		# Threshold is a percentage.
+		tstart, tend = self.find_times_over_threshold(threshold=threshold)
+		return tend-tstart
+	
+	def calculate_collected_charge(self, R=1, threshold=None):
 		# R: The proportionality factor to go from Volts to Ampere, i.e. the resistance.
 		# Threshold: Which part of the signal do we consider for calculating the charge. It is a percentage, e.g. threshold = 10 %. If no value is provided, the noise threshold is used.
 		if threshold == None:
@@ -317,6 +322,9 @@ class LGADSignal(Signal):
 		t_start, t_stop = self.find_times_over_threshold(threshold=threshold)
 		Q, *_ = integrate.quad(lambda t: (self.signal_at(time=t)-self.baseline)/R, t_start, t_stop)
 		return Q, (t_start, t_stop)
+	
+	def collected_charge(self, R=1):
+		return self.calculate_collected_charge(R=R,threshold=self.noise/self.amplitude*100)[0]
 	
 def plot_signal_analysis(signal: LGADSignal, ax):
 	ax.plot(
