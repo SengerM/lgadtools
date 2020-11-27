@@ -1,6 +1,12 @@
 # lgadtools
 
-Some stuff for the LGAD detectors.
+Stuff for easilly processing signals produced by LGAD detectors. If you use pure Python (i.e. do not use the TCTAnalyse wrapper for Root) it should be *plug and play*. The following plots were produced using the [LGADSignal class](https://github.com/SengerM/lgadtools/blob/62e8350346d440d9438cc4d60f3ed3ed0f3a250e/lgadtools/LGADSignal.py#L49):
+
+**[Click here to view the plot of the signal in more detail](https://htmlpreview.github.io/?https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.html)**
+
+![Signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.png)
+
+![Detail of signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example_detail.png)
 
 ## Installation
 
@@ -56,13 +62,6 @@ my_signal.t # Returns the time_values_array.
 my_signal.s # Returns the samples_array.
 ```
 You can copy/paste the previous code in your Python interpreter to check how it works.
-
-![Signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.png)
-
-![Detail of signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example_detail.png)
-
-**[Click here to view the plot of the signal in more detail](https://htmlpreview.github.io/?https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.html)**
-
 
 ### TCTAnalyse Python wrapper
 
