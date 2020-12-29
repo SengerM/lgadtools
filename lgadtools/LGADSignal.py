@@ -56,6 +56,7 @@ class LGADSignal(Signal):
 			# ~ return False
 		try:
 			self.rise_window_indices
+			self.calculate_collected_charge()
 		except:
 			return False
 		if self.risetime <= 0:
