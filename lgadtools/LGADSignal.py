@@ -131,7 +131,7 @@ class LGADSignal(Signal):
 		# Finds the two indices such that the signal rises between these two indices. This method is not intended to be called by the user.
 		below_low = self.s < low/100*self.amplitude + self.baseline
 		above_high = self.s > high/100*self.amplitude + self.baseline
-		between = (self.s > low/100*self.amplitude + self.baseline) & (self.s < high/100*self.amplitude + self.baseline)
+		between = (self.s >= low/100*self.amplitude + self.baseline) & (self.s <= high/100*self.amplitude + self.baseline)
 		
 		rising_from_low = False
 		rising_to_high = False
