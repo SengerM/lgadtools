@@ -52,16 +52,20 @@ class LGADSignal(Signal):
 
 	@property
 	def worth(self):
-		# ~ if not is_nice_lgad_shape(self.s - self.baseline):
-			# ~ return False
 		try:
-			self.rise_window_indices
-			self.calculate_collected_charge()
+			self.amplitude
+			self.noise
+			self.risetime
+			self.collected_charge()
+			self.time_at(10)
+			self.time_at(50)
+			self.time_at(90)
+			self.time_over_threshold(20)
 		except:
 			return False
 		if self.risetime <= 0:
 			return False
-		if self.noise_std == 0:
+		if self.noise == 0:
 			return False
 		return True
 	
