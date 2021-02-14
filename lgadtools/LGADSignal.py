@@ -67,8 +67,6 @@ class LGADSignal(Signal):
 			return False
 		if self.noise == 0:
 			return False
-		if self.signal.argmax() < len(self.signal)/2:
-			return False
 		return True
 	
 	@property
@@ -112,7 +110,7 @@ class LGADSignal(Signal):
 			return self.baseline
 	
 	def _find_baseline(self):
-		return self.samples[:int(len(self.samples)/2)].mean()
+		return np.median(self.samples[:np.argmax(self.samples)])
 	
 	def _find_baseline_amplitude(self):
 		return max(np.abs(self.s - self.baseline))
