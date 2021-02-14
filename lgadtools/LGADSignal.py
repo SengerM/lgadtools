@@ -78,16 +78,6 @@ class LGADSignal(Signal):
 			self._s_norm = (self.s - self.baseline)/self.amplitude
 			return self.s_norm
 	
-	def _find_baseline(self, sigmas=1):
-		# Calculates the baseline. This method is not intended to be called by the user.
-		for k, sample in enumerate(self.s):
-			if k < 9:
-				continue
-			baseline = self.s[:k+1].mean()
-			if sample > baseline + sigmas*self.s[:k+1].std() or sample < baseline - sigmas*self.s[:k+1].std():
-				break
-		return baseline
-	
 	def _find_noise_std(self):
 		# Calculates the noise. This method is not intended to be called by the user. 
 		return self.s[:self.rise_window_indices[0]].std()
@@ -116,8 +106,11 @@ class LGADSignal(Signal):
 		if hasattr(self, 'baseline_value'):
 			return self.baseline_value
 		else:
-			self.baseline_value = self._find_baseline(sigmas = 5)
+			self.baseline_value = self._find_baseline()
 			return self.baseline
+	
+	def _find_baseline(self):
+		return self.samples[:int(len(self.samples)/2)].mean()
 	
 	def _find_baseline_amplitude(self):
 		return max(np.abs(self.s - self.baseline))
@@ -132,26 +125,17 @@ class LGADSignal(Signal):
 			return self.amplitude
 	
 	def _find_rise_window_indices(self, low=10, high=90):
-		# Finds the two indices such that the signal rises between these two indices. This method is not intended to be called by the user.
-		below_low = self.s < low/100*self.amplitude + self.baseline
-		above_high = self.s > high/100*self.amplitude + self.baseline
-		between = (self.s >= low/100*self.amplitude + self.baseline) & (self.s <= high/100*self.amplitude + self.baseline)
-		
-		rising_from_low = False
-		rising_to_high = False
-		for k in range(len(self.s)-1):
-			if not between[k]:
-				rising_from_low = False
-				rising_to_high = False
-				continue
-			if between[k] and below_low[k-1]:
-				rising_from_low = True
-				k_start_rise = k
-			if between[k] and above_high[k+1]:
-				rising_to_high = True
-				k_stop_rise = k
-			if rising_from_low and rising_to_high:
-				return k_start_rise, k_stop_rise
+		k = self.s.argmax()
+		k_start_rise = None
+		k_stop_rise = None
+		while k > 0:
+			if self.s[k] - self.baseline > self.amplitude*high/100:
+				k_stop_rise = k - 1
+			if self.s[k] - self.baseline < self.amplitude*low/100:
+				k_start_rise = k + 1
+				break
+			k -= 1
+		return k_start_rise, k_stop_rise
 	
 	def time_at(self, percentage):
 		# Returns the time at <percentage> in the rising window using linear interpolation between the points.
