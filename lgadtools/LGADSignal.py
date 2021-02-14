@@ -67,6 +67,8 @@ class LGADSignal(Signal):
 			return False
 		if self.noise == 0:
 			return False
+		if self.signal.argmax() < len(self.signal)/2:
+			return False
 		return True
 	
 	@property
@@ -135,6 +137,8 @@ class LGADSignal(Signal):
 				k_start_rise = k + 1
 				break
 			k -= 1
+		if k_start_rise is None or k_stop_rise is None:
+			raise RuntimeError(f'Cannot find the rise window of this signal. It is possible that the signal is very noisy, but please check.')
 		return k_start_rise, k_stop_rise
 	
 	def time_at(self, percentage):
