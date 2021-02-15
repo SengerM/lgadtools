@@ -61,6 +61,7 @@ class LGADSignal(Signal):
 			self.time_at(50)
 			self.time_at(90)
 			self.time_over_threshold(20)
+			self.rise_window_indices
 		except:
 			return False
 		if self.risetime <= 0:
