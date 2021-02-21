@@ -16,11 +16,13 @@ Follow the next steps:
 	```
 	pip3 install git+https://github.com/SengerM/lgadtools
 	```
-If you want to use only the LGADSignal class, this is enough. If you want to use the TCTAnalyse wrapper you will also need to follow the next steps:
+If you want to use only the LGADSignal class, this is enough. 
 
-2. Install [Root 6](https://ph-root-2.cern.ch/).
+If you want to use the TCTAnalyse wrapper  for Python you will also need to follow the next steps:
 
-3. Install the [TCTAnalyse](http://particulars.si/TCTAnalyse/) library from [Particulars](http://particulars.si/). If you are using Linux please install it in ```~/.TCTAnalyse.V2.2/TCTAnalyse.sl```. If you are not using Linux, or you want to install it in another location, then you must manually load the library after you import this Python package. Examples:
+1. Install [Root 6](https://ph-root-2.cern.ch/).
+
+2. Install the [TCTAnalyse](http://particulars.si/TCTAnalyse/) library from [Particulars](http://particulars.si/). If you are using Linux please install it in ```~/.TCTAnalyse.V2.2/TCTAnalyse.sl```. If you are not using Linux, or you want to install it in another location, then you must manually load the library after you import this Python package. Examples:
 
   - If you use Linux and have installed the library at ```~/.TCTAnalyse.V2.2/TCTAnalyse.sl``` then on Python:
   ```
@@ -52,10 +54,9 @@ my_signal = LGADSignal( # Create LGADSignal object with the data.
   samples = samples_array,
 )
  
-my_signal.worth # If this is False, the signal is probably only noise.
 my_signal.amplitude # Returns amplitude.
 my_signal.noise # Returns noise STD.
-my_signal.risetime # Returns 10%→90% rise time.
+my_signal.rise_time # Returns 10%→90% rise time.
 my_signal.SNR # Returns amplitude/noise.
 my_signal.baseline # Returns signal base line.
 my_signal.t # Returns the time_values_array.
@@ -63,8 +64,18 @@ my_signal.s # Returns the samples_array.
 ```
 You can copy/paste the previous code in your Python interpreter to check how it works.
 
+If you want to see the analisis in a plot you can just do:
+```Python
+import myplotlib as mpl # https://github.com/SengerM/myplotlib
+
+figure = mpl.manager.new()
+my_signal.plot_myplotlib(figure)
+figure.show()
+```
+
 ### TCTAnalyse Python wrapper
 
+This is an old wrapper I made when I started working with the TCT and I was using the software from Particulars. Now I am not using this wrapper anymore as I do all my processing within Python using the ```LGADSignal``` class.
 ```
 from lgadtools import TCTAnalyse
 import matplotlib.pyplot as plt
