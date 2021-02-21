@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
 	name="lgadtools",
-	version="0.0.0",
+	version="1.0.0",
 	author="Matias H. Senger",
 	author_email="m.senger@hotmail.com",
 	description="Stuff for LGAD detectors",
