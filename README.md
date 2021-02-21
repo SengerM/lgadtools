@@ -2,8 +2,6 @@
 
 Stuff for easilly processing signals produced by LGAD detectors. If you use pure Python (i.e. do not use the TCTAnalyse wrapper for Root) it should be *plug and play*. The following plots were produced using the [LGADSignal class](https://github.com/SengerM/lgadtools/blob/62e8350346d440d9438cc4d60f3ed3ed0f3a250e/lgadtools/LGADSignal.py#L49):
 
-**[Click here to view the plot of the signal in more detail](https://htmlpreview.github.io/?https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.html)**
-
 ![Signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.png)
 
 ![Detail of signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example_detail.png)
@@ -76,7 +74,7 @@ figure.show()
 ### TCTAnalyse Python wrapper
 
 This is an old wrapper I made when I started working with the TCT and I was using the software from Particulars. Now I am not using this wrapper anymore as I do all my processing within Python using the ```LGADSignal``` class.
-```
+```Python
 from lgadtools import TCTAnalyse
 import matplotlib.pyplot as plt
 
