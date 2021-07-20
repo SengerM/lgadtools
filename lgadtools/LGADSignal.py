@@ -327,7 +327,7 @@ class LGADSignal(Signal):
 			[self.baseline + self.noise, self.baseline + self.noise] + [float('NaN')] + [self.baseline - self.noise, self.baseline - self.noise],
 			label = f'Noise ({self.noise:.2e} V)',
 			color = (.6,)*3,
-			linestyle = '--',
+			linestyle = 'dashed',
 		)
 		try:
 			fig.plot(
@@ -349,9 +349,9 @@ class LGADSignal(Signal):
 				[t_start_rise, t_start_rise+self.rise_time, t_start_rise+self.rise_time, t_start_rise, t_start_rise],
 				self.baseline + np.array([self.amplitude*.1, self.amplitude*.1, self.amplitude*.9, self.amplitude*.9, self.amplitude*.1]),
 				label = f'Rise time ({self.rise_time:.2e} s)',
-				color = (1,0,0),
+				color = (0,0,0),
 				alpha = .5,
-				linestyle = '--',
+				linestyle = 'dashed',
 			)
 		except:
 			pass
