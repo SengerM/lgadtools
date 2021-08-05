@@ -387,3 +387,80 @@ class LGADSignal(Signal):
 			)
 		except:
 			pass
+		
+	def plot_grafica(self, fig):
+		# <fig> is a Figure object created with grafica (not yet published).
+		from grafica.figure import Figure
+		if not isinstance(fig, Figure):
+			raise TypeError(f'<fig> must be an instance of {Figure}, received an object of type {type(fig)}.')
+		fig.xlabel = 'Time (s)'
+		fig.ylabel = 'Amplitude (V)'
+
+		fig.scatter(
+			[min(self.t), max(self.t)],
+			[self.baseline, self.baseline],
+			label = f'Baseline ({self.baseline:.2e} V)',
+			color = (0,0,0)
+		)
+		fig.scatter(
+			[min(self.t), max(self.t)] + [max(self.t)] + [max(self.t), min(self.t)],
+			[self.baseline + self.noise, self.baseline + self.noise] + [float('NaN')] + [self.baseline - self.noise, self.baseline - self.noise],
+			label = f'Noise ({self.noise:.2e} V)',
+			color = (.6,)*3,
+			linestyle = 'dashed',
+		)
+		try:
+			fig.scatter(
+				[self.t[np.argmax(self.s)-9],self.t[np.argmax(self.s)+9]] + 2*[self.t[np.argmax(self.s)]] + [self.t[np.argmax(self.s)-9],self.t[np.argmax(self.s)+9]],
+				2*[self.baseline] + [self.baseline, self.baseline + self.amplitude] + 2*[self.baseline+self.amplitude],
+				label = f'Amplitude ({self.amplitude:.2e} V)',
+				color = (0,.6,0),
+			)
+		except:
+			fig.scatter(
+				[self.t[np.argmax(self.s)]]*2,
+				[self.baseline, self.baseline+self.amplitude],
+				label = f'Amplitude ({self.amplitude:.2e} V)',
+				color = (0,.6,0),
+			)
+		try:
+			t_start_rise = self.find_time_at_rising_edge(threshold=10)
+			fig.scatter(
+				[t_start_rise, t_start_rise+self.rise_time, t_start_rise+self.rise_time, t_start_rise, t_start_rise],
+				self.baseline + np.array([self.amplitude*.1, self.amplitude*.1, self.amplitude*.9, self.amplitude*.9, self.amplitude*.1]),
+				label = f'Rise time ({self.rise_time:.2e} s)',
+				color = (0,0,0),
+				alpha = .5,
+				linestyle = 'dashed',
+			)
+		except:
+			pass
+		try:
+			threshold = 20
+			t_start, t_stop = self.find_over_threshold_times(threshold)
+			fig.scatter(
+				[t_start,t_stop],
+				2*[self.baseline+threshold/100*self.amplitude],
+				label = f'Time over {threshold} % ({t_stop-t_start:.2e} s)',
+				linestyle = '--',
+				color = (.8,.3,.8)
+			)
+		except:
+			pass
+		fig.scatter(
+			self.t,
+			self.s,
+			label = 'Signal',
+			marker = '.',
+			color = (.4,.5,.8),
+		)
+		try:
+			t_start, t_stop = self.find_over_threshold_times(threshold = self.noise/self.amplitude*100)
+			fig.scatter(
+				[t_start] + list(self.time[(self.time>t_start)&(self.time<t_stop)]) + [t_start + self.time_over_noise] + [t_stop,t_start] + [t_start],
+				[self.signal_at(t_start)] + list(self.samples[(self.time>t_start)&(self.time<t_stop)]) + [self.signal_at(t_start + self.time_over_noise)] + 2*[self.baseline] + [self.signal_at(t_start)],
+				label = f'Collected charge ({self.collected_charge:.2e} a.u.)',
+				color = (1,0,0),
+			)
+		except:
+			pass
