@@ -98,17 +98,6 @@ class LGADSignal(Signal):
 			return self._rise_time
 	
 	@property
-	def collected_charge(self):
-		if hasattr(self, '_collected_charge'):
-			return self._collected_charge
-		else:
-			try:
-				self._collected_cahrge = self.calculate_collected_charge(R=1,threshold=self.noise/self.amplitude*100)[0]
-			except:
-				self._collected_charge = float('NaN')
-			return self._collected_charge
-	
-	@property
 	def rising_edge_indices(self):
 		if hasattr(self, '_rising_edge_indices'):
 			return self._rising_edge_indices
