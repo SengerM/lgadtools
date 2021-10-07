@@ -141,6 +141,32 @@ class LGADSignal(Signal):
 				self._collected_charge = float('NaN')
 			return self._collected_charge
 	
+	def time_at_rising_edge(self, threshold: float):
+		"""Returns the time at a certain threshold value (percentage) within the rising edge doing a linear interpolation."""
+		try:
+			threshold = float(threshold)
+			if not isinstance(threshold, float):
+				raise ValueError()
+		except:
+			raise ValueError(f'<threshold> must be a float number, received object of type {type(threshold)}.')
+		try:
+			return self.find_time_at_rising_edge(threshold)
+		except:
+			return float('NaN')
+	
+	def time_at_falling_edge(self, threshold: float):
+		"""Returns the time at a certain threshold value (percentage) within the falling edge doing a linear interpolation."""
+		try:
+			threshold = float(threshold)
+			if not isinstance(threshold, float):
+				raise ValueError()
+		except:
+			raise ValueError(f'<threshold> must be a float number, received object of type {type(threshold)}.')
+		try:
+			return self.find_time_at_falling_edge(threshold)
+		except:
+			return float('NaN')
+		
 	# find_ methods ----------------------------------------------------
 	
 	def find_baseline(self):
