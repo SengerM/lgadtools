@@ -244,7 +244,7 @@ class LGADSignal(Signal):
 			raise RuntimeError('Cannot find the amplitude of the signal.')
 		if np.isnan(self.baseline):
 			raise RuntimeError('Cannot find the baseline of the signal.')
-		return time_vs_voltage_in_rising_edge(self.amplitude*threshold/100 + self.baseline)
+		return float(time_vs_voltage_in_rising_edge(self.amplitude*threshold/100 + self.baseline))
 	
 	def find_time_at_falling_edge(self, threshold: float):
 		# Returns the time at <threshold> in the rising edge using linear interpolation between the samples.
