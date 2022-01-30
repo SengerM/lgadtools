@@ -72,24 +72,3 @@ figure = mpl.manager.new()
 my_signal.plot_myplotlib(figure)
 figure.show()
 ```
-
-### TCTAnalyse Python wrapper
-
-This is an old wrapper I made when I started working with the TCT and I was using the software from Particulars. Now I am not using this wrapper anymore as I do all my processing within Python using the ```LGADSignal``` class.
-```Python
-from lgadtools import TCTAnalyse
-import matplotlib.pyplot as plt
-
-stct = TCTAnalyse.PSTCT('path/to/binary/file/produced/by/TCT_software')
-
-signal = stct.GetWF(y=1) # Get the sinal from the y=1 step.
-print(signal.amplitude)
-print(signal.noise)
-print(signal.risetime)
-print(signal.t) # Time samples.
-print(signal.s) # Signal samples.
-
-fig, ax = plt.subplots()
-signal.plot(ax) # Plot the signal.
-plt.show()
-```
