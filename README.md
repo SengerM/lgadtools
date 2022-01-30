@@ -1,5 +1,7 @@
 # lgadtools
 
+*DEPRECATED* Please use the [*signals package*](https://github.com/SengerM/signals).
+
 Stuff for easilly processing signals produced by LGAD detectors. If you use pure Python (i.e. do not use the TCTAnalyse wrapper for Root) it should be *plug and play*. The following plots were produced using the [LGADSignal class](https://github.com/SengerM/lgadtools/blob/62e8350346d440d9438cc4d60f3ed3ed0f3a250e/lgadtools/LGADSignal.py#L49):
 
 ![Signal processed by LGADTools](https://github.com/SengerM/lgadtools/blob/master/doc/lgad_signal_example.png)
